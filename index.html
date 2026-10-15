@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrailSafe - Smart Trekking & Tourist Safety System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        forest: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d' },
+                        trail: { 500: '#f97316', 600: '#ea580c' }
+                    },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans transition-colors duration-300 dark:bg-slate-900 dark:text-slate-100">
+
+    <!-- Top Emergency Bar -->
+    <div class="bg-red-600 text-white text-xs sm:text-sm font-semibold py-2 px-4 text-center flex items-center justify-center gap-3 shadow-inner">
+        <span class="flex h-2.5 w-2.5 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+        </span>
+        <span>EMERGENCY DISPATCH DIRECT: 112 / National Rescue Helpline</span>
+        <button onclick="triggerSOS()" class="bg-white text-red-600 px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-red-100 transition shadow">Trigger SOS</button>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 dark:bg-slate-900/90 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-forest-600 text-white p-2.5 rounded-xl shadow-md">
+                    <i class="fa-solid fa-mountain-sun text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold bg-gradient-to-r from-forest-600 to-trail-500 bg-clip-text text-transparent">TrailSafe</span>
+                    <span class="block text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Smart Trekking & Safety System</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+                <a href="#routes" class="hover:text-forest-600 transition">Routes & Difficulty</a>
+                <a href="#map-section" class="hover:text-forest-600 transition">Safety Map</a>
+                <a href="#booking-payment" class="hover:text-forest-600 transition">Permits & Payments</a>
+                <a href="#assistant" class="hover:text-forest-600 transition">AI Companion</a>
+                <a href="#checklist" class="hover:text-forest-600 transition">Safety Checklist</a>
+                <a href="#admin" class="hover:text-forest-600 transition">Admin Reports</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+                <a href="#booking-payment" class="hidden sm:inline-flex bg-forest-600 hover:bg-forest-700 text-white font-medium px-4 py-2 rounded-xl text-sm shadow-md transition items-center gap-2">
+                    <i class="fa-solid fa-ticket"></i> Book Trek / Pay
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden bg-gradient-to-b from-forest-50 to-white dark:from-slate-900 dark:to-slate-900 py-16 sm:py-24 border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-forest-100 text-forest-800 dark:bg-forest-900/50 dark:text-forest-300 mb-6">
+                    <i class="fa-solid fa-shield-halved"></i> CMCS College Academic Project 2026-2027[cite: 1]
+                </span>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight mb-6">
+                    Explore Safely, <span class="text-forest-600">Track Intelligently</span>.
+                </h1>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
+                    A centralized web platform for route discovery, difficulty assessment, live location sharing, weather-aware trip planning, emergency SOS assistance[cite: 1], and seamless online/offline bookings.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#routes" class="bg-forest-600 hover:bg-forest-700 text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-compass"></i> Explore Routes
+                    </a>
+                    <a href="#booking-payment" class="bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-700 font-semibold px-6 py-3.5 rounded-xl shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-credit-card text-trail-500"></i> Online & Offline Pay
+                    </a>
+                </div>
+            </div>
+            <!-- Quick SOS & Safety Widget Card -->
+            <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 relative">
+                <div class="absolute -top-3 -right-3 bg-trail-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">Live System</div>
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-satellite-dish text-forest-600"></i> Safety Control Center</h3>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 block">GPS Coordinates</span>
+                            <span id="gps-coords" class="font-mono font-bold text-sm">19.9975° N, 73.7898° E (Nashik Zone)</span>
+                        </div>
+                        <button onclick="updateGPS()" class="text-xs bg-forest-100 text-forest-700 dark:bg-forest-900 dark:text-forest-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-forest-200 transition">Refresh GPS</button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 rounded-xl bg-forest-50 dark:bg-forest-900/20 border border-forest-200 dark:border-forest-800">
+                            <span class="text-xs text-forest-600 dark:text-forest-400 block font-medium">Weather Status</span>
+                            <span class="font-bold text-slate-700 dark:text-slate-200 text-sm">28°C • Clear Trail</span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                            <span class="text-xs text-amber-600 dark:text-amber-400 block font-medium">Risk Index</span>
+                            <span class="font-bold text-amber-700 dark:text-amber-300 text-sm">Low (Safe to Trek)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="triggerSOS()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-red-500/20 transition flex items-center justify-center gap-3 text-lg animate-pulse">
+                    <i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY SOS SIGNAL
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Route Discovery & Difficulty Assessment -->
+    <section id="routes" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+                <span class="text-forest-600 font-semibold text-sm uppercase tracking-wider">Module 2 & 3</span>
+                <h2 class="text-3xl font-extrabold tracking-tight mt-1">Smart Trekking Routes</h2>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="filterRoutes('all')" class="route-filter-btn active-filter px-4 py-2 rounded-xl text-sm font-semibold bg-forest-600 text-white transition">All Routes</button>
+                <button onclick="filterRoutes('Easy')" class="route-filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition">Easy</button>
+                <button onclick="filterRoutes('Moderate')" class="route-filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition">Moderate</button>
+                <button onclick="filterRoutes('Difficult')" class="route-filter-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 transition">Difficult</button>
+            </div>
+        </div>
+
+        <div id="route-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Route Cards injected by JS -->
+        </div>
+    </section>
+
+    <!-- Interactive Safety Map & Hazard Tracker -->
+    <section id="map-section" class="py-16 bg-slate-100 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-8">
+                <span class="text-forest-600 font-semibold text-sm uppercase tracking-wider">Module 4 & 6</span>
+                <h2 class="text-3xl font-extrabold tracking-tight mt-1">Live Safety & Rescue Map</h2>
+                <p class="text-slate-600 dark:text-slate-400 mt-1">Interactive map displaying check-in stations, rescue hubs, medical points, and hazard alerts.</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700">
+                <div id="leaflet-map" class="w-full h-[450px] rounded-2xl z-10"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payments & Permits Module (Online & Offline Options) -->
+    <section id="booking-payment" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 p-8 sm:p-10">
+            <div class="text-center mb-8">
+                <span class="text-forest-600 font-semibold text-sm uppercase tracking-wider">Trek Registration & Fee System</span>
+                <h2 class="text-3xl font-extrabold mt-1">Secure Permit Booking & Payments</h2>
+                <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Choose your destination and preferred payment method (Online UPI/Card or Offline Cash at Base Camp).</p>
+            </div>
+
+            <form id="payment-form" onsubmit="handleBookingSubmit(event)" class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Trekker Full Name</label>
+                        <input type="text" id="payer-name" required placeholder="e.g. Harshal Nikam" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:ring-2 focus:ring-forest-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Select Trek Destination</label>
+                        <select id="trek-select" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:ring-2 focus:ring-forest-500 outline-none">
+                            <option value="Tringalwadi Fort">Tringalwadi Fort (₹499)</option>
+                            <option value="Kalsubai Peak">Kalsubai Peak (₹799)</option>
+                            <option value="Harishchandragad">Harishchandragad (₹699)</option>
+                            <option value="Rajgad Fort">Rajgad Fort (₹599)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Emergency Contact Phone Number</label>
+                    <input type="tel" id="emergency-phone" required placeholder="+91 98765 43210" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:ring-2 focus:ring-forest-500 outline-none">
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div>
+                    <label class="block text-sm font-semibold mb-3">Select Payment Method</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:border-forest-500 transition payment-option-card">
+                            <input type="radio" name="payment_mode" value="online" checked onchange="togglePaymentMode('online')" class="text-forest-600 focus:ring-forest-500">
+                            <div>
+                                <span class="font-bold block text-sm flex items-center gap-2"><i class="fa-solid fa-globe text-forest-600"></i> Online Payment</span>
+                                <span class="text-xs text-slate-500">UPI, Credit/Debit Card, NetBanking</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 cursor-pointer hover:border-forest-500 transition payment-option-card">
+                            <input type="radio" name="payment_mode" value="offline" onchange="togglePaymentMode('offline')" class="text-forest-600 focus:ring-forest-500">
+                            <div>
+                                <span class="font-bold block text-sm flex items-center gap-2"><i class="fa-solid fa-money-bill-wave text-amber-600"></i> Offline Payment</span>
+                                <span class="text-xs text-slate-500">Pay Cash / QR at Base Camp</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Online Payment Details Box -->
+                <div id="online-box" class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Online Gateway Details</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button type="button" class="p-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-semibold shadow-sm hover:border-forest-500 transition">UPI / GPay / PhonePe</button>
+                        <button type="button" class="p-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-semibold shadow-sm hover:border-forest-500 transition">Credit / Debit Card</button>
+                        <button type="button" class="p-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-semibold shadow-sm hover:border-forest-500 transition">Net Banking</button>
+                    </div>
+                </div>
+
+                <!-- Offline Payment Details Box -->
+                <div id="offline-box" class="hidden p-4 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-200 dark:border-amber-800 space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Offline Registration Policy</span>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Your permit pass will be generated immediately in <strong>Pending Verification</strong> status. You can pay cash directly to the Base Camp warden upon arrival or scan the Base Camp UPI QR code on-site to complete payment.
+                    </p>
+                </div>
+
+                <button type="submit" class="w-full bg-forest-600 hover:bg-forest-700 text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-lock"></i> Confirm Registration & Generate Permit Pass
+                </button>
+            </form>
+
+            <!-- Success Receipt / Pass Modal Area -->
+            <div id="receipt-box" class="hidden mt-8 p-6 bg-forest-50 dark:bg-forest-900/30 border border-forest-300 dark:border-forest-800 rounded-2xl text-center space-y-4">
+                <div class="inline-flex p-3 bg-forest-600 text-white rounded-full shadow-md">
+                    <i class="fa-solid fa-check text-xl"></i>
+                </div>
+                <h4 class="text-xl font-bold text-forest-800 dark:text-forest-200">Digital Safety Pass Generated!</h4>
+                <div id="receipt-details" class="text-sm text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-800 p-4 rounded-xl shadow-inner text-left"></div>
+                <button onclick="window.print()" class="bg-slate-800 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-slate-900 transition">
+                    <i class="fa-solid fa-print"></i> Print / Download Pass
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Trail Companion Assistant -->
+    <section id="assistant" class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="p-6 bg-forest-600 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-white/10 rounded-xl backdrop-blur">
+                        <i class="fa-solid fa-robot text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg">TrailSafe AI Companion</h3>
+                        <span class="text-xs text-forest-100">Instant First-Aid, Wildlife & Survival Guidance</span>
+                    </div>
+                </div>
+                <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-forest-300 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                </span>
+            </div>
+
+            <div id="chat-messages" class="p-6 h-80 overflow-y-auto space-y-4 bg-slate-50 dark:bg-slate-900/50 text-sm">
+                <div class="flex items-start gap-3">
+                    <div class="bg-forest-600 text-white p-2 rounded-xl text-xs"><i class="fa-solid fa-robot"></i></div>
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 max-w-lg">
+                        Hello! I am your AI safety companion. Ask me anything about trail first-aid, snakebite treatment, sudden weather drops, or route navigation.
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex gap-2">
+                <input type="text" id="chat-input" placeholder="Type your trekking question..." class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:ring-2 focus:ring-forest-500 outline-none" onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button onclick="sendChatMessage()" class="bg-forest-600 hover:bg-forest-700 text-white px-6 py-3 rounded-xl font-semibold text-sm transition">Send</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Safety Checklist Module -->
+    <section id="checklist" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-10 text-center">
+            <span class="text-forest-600 font-semibold text-sm uppercase tracking-wider">Module 7</span>
+            <h2 class="text-3xl font-extrabold tracking-tight mt-1">Pre-Trek Safety Checklist</h2>
+            <p class="text-slate-600 dark:text-slate-400 mt-1">Ensure you have all essential equipment before embarking on your trek.</p>
+        </div>
+        <div id="checklist-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Injected by JS -->
+        </div>
+    </section>
+
+    <!-- Admin Management & Analytics Module -->
+    <section id="admin" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 text-slate-800/50 text-9xl pointer-events-none">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="relative z-10">
+                <span class="text-forest-400 font-semibold text-sm uppercase tracking-wider">Module 9 & 10</span>
+                <h2 class="text-3xl font-extrabold mt-1 mb-6">Admin Management & Analytics</h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-slate-800/80 backdrop-blur p-6 rounded-2xl border border-slate-700">
+                        <span class="text-xs text-slate-400 block font-medium">Total Registered Trekkers</span>
+                        <span class="text-3xl font-black text-forest-400 mt-2 block">1,428</span>
+                    </div>
+                    <div class="bg-slate-800/80 backdrop-blur p-6 rounded-2xl border border-slate-700">
+                        <span class="text-xs text-slate-400 block font-medium">Active SOS Alerts</span>
+                        <span class="text-3xl font-black text-red-400 mt-2 block">0 Active</span>
+                    </div>
+                    <div class="bg-slate-800/80 backdrop-blur p-6 rounded-2xl border border-slate-700">
+                        <span class="text-xs text-slate-400 block font-medium">Verified Routes</span>
+                        <span class="text-3xl font-black text-blue-400 mt-2 block">24 Routes</span>
+                    </div>
+                    <div class="bg-slate-800/80 backdrop-blur p-6 rounded-2xl border border-slate-700">
+                        <span class="text-xs text-slate-400 block font-medium">Online/Offline Payments</span>
+                        <span class="text-3xl font-black text-amber-400 mt-2 block">₹84,500</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
+            <p>© 2026-2027 TrailSafe - Smart Trekking & Tourist Safety System[cite: 1]. B.Sc. Computer Science Project, CMCS College, Nashik[cite: 1].</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Theme Toggle
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        // GPS Refresh Simulation
+        function updateGPS() {
+            const lat = (19.9 + Math.random() * 0.1).toFixed(4);
+            const lng = (73.7 + Math.random() * 0.1).toFixed(4);
+            document.getElementById('gps-coords').innerText = `${lat}° N, ${lng}° E (Nashik Zone)`;
+            alert('GPS Coordinates successfully updated via satellite ping!');
+        }
+
+        // SOS Trigger function with audio siren
+        function triggerSOS() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            setTimeout(() => { osc.stop(); }, 1500);
+            alert('🚨 EMERGENCY SOS BROADCASTED! District rescue control and your emergency contacts have received your live GPS location.');
+        }
+
+        // Routes Data
+        const routesData = [
+            { name: "Tringalwadi Fort", diff: "Easy", dist: "5.2 km", time: "2.5 hrs", region: "Nashik, MH", price: 499, desc: "Picturesque fort overlooking Igatpuri landscapes with moderate ascent." },
+            { name: "Kalsubai Peak", diff: "Difficult", dist: "6.6 km", time: "4.5 hrs", region: "Ahmednagar/Nashik", price: 799, desc: "Highest peak of Maharashtra (1,646m) featuring iron ladders and steep ridges." },
+            { name: "Harishchandragad", diff: "Moderate", dist: "8.0 km", time: "5.0 hrs", region: "Kokon Kada", price: 699, desc: "Famous for Konkan Kada cliff view and ancient caves." },
+            { name: "Rajgad Fort", diff: "Moderate", dist: "7.5 km", time: "4.0 hrs", region: "Pune Region", price: 599, desc: "Historic capital fort with massive fortifications and scenic plateau." },
+            { name: "Harihar Fort", diff: "Difficult", dist: "4.0 km", time: "3.0 hrs", region: "Trimbakeshwar", price: 649, desc: "Unique rock-cut vertical staircases rising sharply into the clouds." },
+            { name: "Brahmagiri Trek", diff: "Easy", dist: "4.5 km", time: "2.0 hrs", region: "Trimbak", price: 449, desc: "Origin point of Godavari river with lush green surroundings." }
+        ];
+
+        function renderRoutes(filter = 'all') {
+            const grid = document.getElementById('route-grid');
+            grid.innerHTML = '';
+            const filtered = filter === 'all' ? routesData : routesData.filter(r => r.diff === filter);
+            
+            filtered.forEach(r => {
+                const diffColor = r.diff === 'Easy' ? 'bg-green-100 text-green-800' : r.diff === 'Moderate' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800';
+                grid.innerHTML += `
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-700 p-6 flex flex-col justify-between hover:shadow-xl transition">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${diffColor}">${r.diff}</span>
+                                <span class="text-forest-600 font-extrabold text-lg">₹${r.price}</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">${r.name}</h3>
+                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 leading-relaxed">${r.desc}</p>
+                            <div class="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-500 mb-6 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl">
+                                <div><i class="fa-solid fa-route text-forest-600 mr-1"></i> Distance: ${r.dist}</div>
+                                <div><i class="fa-solid fa-clock text-forest-600 mr-1"></i> Duration: ${r.time}</div>
+                            </div>
+                        </div>
+                        <button onclick="selectTrek('${r.name}')" class="w-full bg-forest-600 hover:bg-forest-700 text-white font-semibold py-2.5 rounded-xl text-sm transition">Book & Register</button>
+                    </div>
+                `;
+            });
+        }
+
+        function filterRoutes(diff) {
+            document.querySelectorAll('.route-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-forest-600', 'text-white');
+                btn.classList.add('bg-slate-200', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+            });
+            event.target.classList.add('bg-forest-600', 'text-white');
+            event.target.classList.remove('bg-slate-200', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+            renderRoutes(diff);
+        }
+
+        function selectTrek(trekName) {
+            document.getElementById('trek-select').value = trekName;
+            document.getElementById('booking-payment').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Payment Toggle
+        function togglePaymentMode(mode) {
+            if (mode === 'online') {
+                document.getElementById('online-box').classList.remove('hidden');
+                document.getElementById('offline-box').classList.add('hidden');
+            } else {
+                document.getElementById('online-box').classList.add('hidden');
+                document.getElementById('offline-box').classList.remove('hidden');
+            }
+        }
+
+        // Handle Booking Submission
+        function handleBookingSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('payer-name').value;
+            const trek = document.getElementById('trek-select').value;
+            const phone = document.getElementById('emergency-phone').value;
+            const mode = document.querySelector('input[name="payment_mode"]:checked').value;
+            const passId = 'TS-' + Math.floor(100000 + Math.random() * 900000);
+
+            let paymentStatus = mode === 'online' ? '<span class="text-green-600 font-bold">PAID (Online Gateway Verified)</span>' : '<span class="text-amber-600 font-bold">PENDING (Pay at Base Camp / Cash/QR)</span>';
+
+            document.getElementById('receipt-details').innerHTML = `
+                <strong>Pass ID:</strong> ${passId}<br>
+                <strong>Trekker:</strong> ${name}<br>
+                <strong>Destination:</strong> ${trek}<br>
+                <strong>Emergency Contact:</strong> ${phone}<br>
+                <strong>Payment Mode:</strong> ${mode.toUpperCase()}<br>
+                <strong>Status:</strong> ${paymentStatus}
+            `;
+            document.getElementById('receipt-box').classList.remove('hidden');
+            document.getElementById('receipt-box').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize Leaflet Map
+        document.addEventListener("DOMContentLoaded", () => {
+            renderRoutes('all');
+            renderChecklist();
+
+            const map = L.map('leaflet-map').setView([19.9975, 73.7898], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            L.marker([19.9975, 73.7898]).addTo(map).bindPopup("<b>Nashik Control Hub</b><br>Rescue Dispatch Station").openPopup();
+            L.marker([19.6833, 73.5167]).addTo(map).bindPopup("<b>Tringalwadi Checkpoint</b><br>Safety Station & Water Point");
+            L.marker([19.6014, 73.7128]).addTo(map).bindPopup("<b>Kalsubai Base Camp</b><br>First Aid & Offline Payment Kiosk");
+        });
+
+        // AI Chat Assistant Simulation
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const container = document.getElementById('chat-messages');
+            if(!input.value.trim()) return;
+
+            const userText = input.value;
+            container.innerHTML += `
+                <div class="flex items-start justify-end gap-3">
+                    <div class="bg-slate-800 text-white p-4 rounded-2xl shadow-sm max-w-lg">${userText}</div>
+                    <div class="bg-slate-700 text-white p-2 rounded-xl text-xs"><i class="fa-solid fa-user"></i></div>
+                </div>
+            `;
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                let aiReply = "I recommend checking our weather alert module and carrying 3L of water and an offline map for this route.";
+                const lower = userText.toLowerCase();
+                if(lower.includes('snake') || lower.includes('bite')) {
+                    aiReply = "First-Aid for Snakebite: Keep the victim calm, immobilize the bitten limb below heart level, do NOT cut or suck the wound, and immediately trigger SOS or call district rescue!";
+                } else if(lower.includes('weather') || lower.includes('rain')) {
+                    aiReply = "Sudden rain on ridges can cause slippery slopes and high wind chill. Secure waterproof ponchos and shelter at the nearest checkpoint.";
+                } else if(lower.includes('water')) {
+                    aiReply = "Hydration requirement: Carry at least 3 liters of electrolytes and water. Natural mountain streams should be filtered before drinking.";
+                }
+
+                container.innerHTML += `
+                    <div class="flex items-start gap-3">
+                        <div class="bg-forest-600 text-white p-2 rounded-xl text-xs"><i class="fa-solid fa-robot"></i></div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 max-w-lg">${aiReply}</div>
+                    </div>
+                `;
+                container.scrollTop = container.scrollHeight;
+            }, 1000);
+        }
+
+        // Safety Checklist Render
+        const checklistItems = [
+            { title: "Hydration & Water", desc: "Minimum 3 Liters per person in reusable bottles.", icon: "fa-bottle-water" },
+            { title: "First-Aid Kit", desc: "Bandages, antiseptic wipes, pain relievers, snakebite kit.", icon: "fa-kit-medical" },
+            { title: "Offline Navigation", desc: "Downloaded topographic map and compass.", icon: "fa-compass" },
+            { title: "Emergency Gear", desc: "Whistle, LED headlamp, power bank, thermal blanket.", icon: "fa-flashlight" }
+        ];
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+            checklistItems.forEach((item, index) => {
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-md border border-slate-200 dark:border-slate-700 flex items-start gap-4">
+                        <div class="p-3 bg-forest-100 text-forest-700 dark:bg-forest-900/50 dark:text-forest-300 rounded-2xl">
+                            <i class="fa-solid ${item.icon} text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-base mb-1">${item.title}</h4>
+                            <p class="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">${item.desc}</p>
+                            <label class="flex items-center gap-2 mt-3 cursor-pointer text-xs font-semibold text-forest-600">
+                                <input type="checkbox" class="rounded text-forest-600 focus:ring-forest-500 w-4 h-4"> Packed & Verified
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+       
+    </script>
+</body>
+</html>
